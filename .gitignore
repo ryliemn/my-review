@@ -1,0 +1,6 @@
+# Output bytecode
+out/
+
+#IntelliJ IDEA files
+.idea/tasks.xml
+.idea/workspace.xml
