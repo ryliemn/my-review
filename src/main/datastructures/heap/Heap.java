@@ -36,34 +36,70 @@ public class Heap<T extends Comparable<T>> {
      * Since this is a min-heap, a node must be less than its two children. This is accomplished by adding the new
      * element to the end of the list representing the heap, and then "bubbling" it up until it is in an appropriate
      * position.
+     *
+     * This is done by continously comparing the inserted node against its parent. If it is less than the parent, swap
+     * the two nodes. Keep going until the added element is greater than its parent.
      */
 
     public void push(T item) {
         data.add(item);
+        if (data.size() == 1) {
+            return;
+        }
 
         int indexOfItem = data.size() - 1;
-        int indexOfParent = getParentIndex(indexOfItem);
-        if (indexOfParent < 0) {
-            return ;
-        }
-        T valOfParent = data.get(indexOfParent);
-        boolean isLessThanOrEqualToParent = item.compareTo(valOfParent) <= 0;
+        boolean isLessThanOrEqualToParent;
+        int indexOfParent;
+        T valOfParent;
 
-        while (isLessThanOrEqualToParent) {
-            data.set(indexOfParent, item);
-            data.set(indexOfItem, valOfParent);
-            indexOfItem = indexOfParent;
+        do {
             indexOfParent = getParentIndex(indexOfItem);
-            if (indexOfParent < 0) {
-                break;
-            }
             valOfParent = data.get(indexOfParent);
             isLessThanOrEqualToParent = item.compareTo(valOfParent) <= 0;
-        }
+            if (isLessThanOrEqualToParent) {
+                data.set(indexOfParent, item);
+                data.set(indexOfItem, valOfParent);
+                indexOfItem = indexOfParent;
+            }
+        } while (isLessThanOrEqualToParent && indexOfItem != 0);
     }
 
-    public void pop() {
+    /**
+     * Popping an element off the heap is first done by swapping the root of the heap with the last element. The
+     * now-last element can now safely be removed, but the swapped element probably made our heap not so heapy.
+     *
+     * We fix this by sinking the root down by continously swapping it out with the lesser of its two children. Continue
+     * until the element is less than both of its children.
+     */
 
+    public T pop() {
+        T popped = data.get(0);
+        int lastIndex = data.size() - 1;
+        T lastElement = data.get(data.size() - 1);
+        data.set(0, lastElement);
+
+        int currentIndex = 0;
+        T currentValue;
+        T lesserChildValue;
+
+        int lesserChildIndex = getLesserChildIndex(currentIndex);
+
+        // begin sink
+        if (data.size() == 1) {
+            data.remove(0);
+        } else {
+            do {
+                currentValue = data.get(currentIndex);
+                lesserChildValue = data.get(lesserChildIndex);
+                data.set(lesserChildIndex, currentValue);
+                data.set(currentIndex, lesserChildValue);
+                currentIndex = lesserChildIndex;
+                lesserChildIndex = getLesserChildIndex(currentIndex);
+            } while (lesserChildIndex != -1);
+            data.remove(lastIndex);
+        }
+
+        return popped;
     }
 
     @Override
@@ -86,6 +122,24 @@ public class Heap<T extends Comparable<T>> {
 
     private int getRightChildIndex(int parentIndex) {
         return parentIndex * 2 + 2;
+    }
+
+    private int getLesserChildIndex(int parentIndex) {
+        int leftChildIndex = getLeftChildIndex(0);
+        int rightChildIndex = getRightChildIndex(0);
+
+        T parentValue = data.get(parentIndex);
+        T leftChildValue = leftChildIndex < data.size() ? data.get(leftChildIndex) : null;
+        T rightChildValue = rightChildIndex < data.size() ? data.get(rightChildIndex) : null;
+
+        if ((leftChildValue == null && rightChildValue == null) ||
+                (parentValue.compareTo(leftChildValue) <= 0 && parentValue.compareTo(rightChildValue) <= 0)) {
+            return -1; //sentinel value used to indicate the parent is less than its children, or has no children
+        } else if (leftChildValue.compareTo(rightChildValue) <= 0 || rightChildValue == null) {
+            return leftChildIndex;
+        } else {
+            return rightChildIndex;
+        }
     }
 
 }

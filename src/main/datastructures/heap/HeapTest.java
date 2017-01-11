@@ -48,4 +48,21 @@ public class HeapTest {
         assertEquals("[1, 2, 5, 3]", str);
     }
 
+    @Test
+    public void popSingleElement() {
+        heap.push(2);
+        assertEquals((Integer) 2, heap.pop());
+    }
+
+    @Test
+    public void popWithSink() {
+        heap.push(2);
+        heap.push(3);
+        heap.push(5);
+        heap.push(1);
+        heap.pop();
+        String str = heap.toString();
+        assertEquals("[2, 3, 5]", str);
+    }
+
 }
