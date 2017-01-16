@@ -1,4 +1,4 @@
-package main.datastructures.heap;
+package datastructures;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -64,5 +64,7 @@ public class HeapTest {
         String str = heap.toString();
         assertEquals("[2, 3, 5]", str);
     }
+
+
 
 }
